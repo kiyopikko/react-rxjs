@@ -10,15 +10,26 @@ class Root extends React.Component {
     this.handleIncrement = function () {
       Intent.incrementCounter();
     }
+    this.handleLoad = function () {
+      Intent.loadCounter();
+    }
+
+    this.handleLoad();
   }
 
   render() {
     console.log('props', this.props);
+
+    var view = !this.props.counterLoaded ? 'Now loading...' :
+        <div>
+          <h1>Hello</h1>
+          <p>counter: {this.props.counter}</p>
+          <button onClick={this.handleIncrement}>increment</button>
+        </div>;
+
     return (
       <div>
-        <h1>Hello</h1>
-        <p>counter: {this.props.counter}</p>
-        <button onClick={this.handleIncrement}>increment</button>
+        {view}
       </div>
     );
   }

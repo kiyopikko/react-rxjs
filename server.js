@@ -33,11 +33,9 @@ app.get('/api/counter', function(req, res) {
 
 app.post('/api/counter', function(req, res) {
   fs.readFile(COUNTER_FILE, function(err, data) {
-    var state = JSON.parse(data);
-    state.counter = req.body.counter;
-    fs.writeFile(COUNTER_FILE, JSON.stringify(state, null, 4), function(err) {
+    fs.writeFile(COUNTER_FILE, JSON.stringify(req.body, null, 4), function(err) {
       res.setHeader('Cache-Control', 'no-cache');
-      res.json(state);
+      res.json(req.body);
     });
   });
 });

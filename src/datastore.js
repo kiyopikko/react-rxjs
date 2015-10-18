@@ -1,3 +1,3 @@
-var milkcocoa = new MilkCocoa("yieldifw5quur.mlkcca.com");
+var milkcocoa = new MilkCocoa("your-app-id.mlkcca.com");
 
 module.exports = milkcocoa.dataStore('react-rxjs');

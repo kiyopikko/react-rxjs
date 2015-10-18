@@ -8,9 +8,7 @@ var subject = new Rx.ReplaySubject(1);
 var milkcocoa = new MilkCocoa("your-app-id.mlkcca.com");
 var ds = milkcocoa.dataStore('react-rxjs');
 
-var state = {
-  counter: 0
-};
+var state;
 
 loadCounterFromServer(function(data){
   state = {

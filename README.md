@@ -1,7 +1,6 @@
 # react-rxjs
 
-from [justinwoo/react-rxjs-flow
-](https://github.com/justinwoo/react-rxjs-flow)
+from [fdecampredon/react-rxjs-todomvc](https://github.com/fdecampredon/react-rxjs-todomvc)
 
 ## Install Package
 
@@ -13,7 +12,7 @@ npm i
 ## Build
 
 ```
-npm start
+npm run install
 ```
 
 ## Start

@@ -1,24 +1,22 @@
 {
-  "name": "react-rxjs",
-  "version": "1.0.0",
-  "description": "",
+  "name": "react-rxjs-todomvc",
+  "version": "0.1.0",
+  "description": "TodoMVC implementations with React and RxJS",
   "main": "index.js",
-  "scripts": {
-    "start": "webpack -wdc --progress",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kiyopikko/react-rxjs.git"
-  },
-  "devDependencies": {
-    "babel-core": "^5.1.11",
-    "babel-loader": "^5.0.0",
+  "dependencies": {
     "body-parser": "^1.14.1",
+    "director": "~1.2.3",
+    "envify": "~1.2.1",
     "express": "^4.13.3",
-    "keymirror": "^0.1.1",
-    "react": "^0.13.2",
-    "rx": "^2.5.2",
-    "webpack": "^1.8.9"
-  }
+    "react": "~0.10.0",
+    "reactify": "~0.10.0",
+    "rx": "~2.2.17"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "browserify -t reactify src/app.js -o public/js/bundle.js "
+  },
+  "author": "François de Campredon <francois.de.campredon@gmail.com> (https://github.com/fdecampredon)",
+  "license": "Apache Version 2"
 }

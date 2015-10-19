@@ -9,10 +9,10 @@
 var React           = require('react/addons'),
     Rx              = require('rx'),
     CounterActions  = require('../actions/CounterActions'),
-    EventHandler    = require('../utils/eventHandler');
+    EventHandler    = require('../utils/eventHandler'),
+    ds              = require('../utils/datastore');
 
-var ENDPOINT_URL = '/api/';
-var KEY = 'counter';
+var KEY = 'INCREMENT_COUNTER';
 
 var MainView = React.createClass({
 
@@ -27,32 +27,51 @@ var MainView = React.createClass({
 
         var incrementBtnClick = EventHandler.create();
         incrementBtnClick
-          .subscribe(CounterActions.increment);
+          .subscribe(function(){
+            ds.set(KEY, {counter: this.state.counter + 1});
+          }.bind(this));
 
-        var loadFromJson = EventHandler.create();
-        loadFromJson
+        var loadFromMilkcocoa = EventHandler.create();
+        loadFromMilkcocoa
           .subscribe(CounterActions.load);
+
+        var receiveFromMilkcocoa = EventHandler.create();
+        receiveFromMilkcocoa
+          .subscribe(CounterActions.receive);
 
         this.handlers = {
           incrementBtnClick: incrementBtnClick,
-          loadFromJson: loadFromJson
+          loadFromMilkcocoa: loadFromMilkcocoa,
+          receiveFromMilkcocoa: receiveFromMilkcocoa
         };
     },
 
     componentDidMount: function () {
-      // load from json
-      $.ajax({
-        url: ENDPOINT_URL + KEY,
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-          data.counter = Number(data.counter);
-          this.handlers.loadFromJson(data);
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(ENDPOINT_URL + KEY, status, err.toString());
+      // load from milkcocoa
+      ds.get(KEY, function (err, datum) {
+        if(err){
+          if(err === 'not found'){
+            var initialCounter = {counter: 0};
+            ds.set(KEY, initialCounter);
+            this.handlers.loadFromMilkcocoa(initialCounter);
+          }else{
+            console.error(err);
+          }
+          return;
         }
-      });
+        this.handlers.loadFromMilkcocoa(datum.value);
+      }.bind(this));
+
+      // message comes from milkcocoa
+      ds.on('set', function (setted) {
+        switch(setted.id){
+          case KEY:
+            this.handlers.receiveFromMilkcocoa(setted.value);
+            break;
+          default:
+            console.error('Not registered action');
+        }
+      }.bind(this));
     },
 
     render: function () {

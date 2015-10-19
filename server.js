@@ -16,30 +16,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 
-var COUNTER_FILE = path.join(__dirname, 'counter.json');
-
 app.set('port', (process.env.PORT || 3000));
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
-app.get('/api/counter', function(req, res) {
-  fs.readFile(COUNTER_FILE, function(err, data) {
-    res.setHeader('Cache-Control', 'no-cache');
-    res.json(JSON.parse(data));
-  });
-});
-
-app.post('/api/counter', function(req, res) {
-  fs.readFile(COUNTER_FILE, function(err, data) {
-    fs.writeFile(COUNTER_FILE, JSON.stringify(req.body, null, 4), function(err) {
-      res.setHeader('Cache-Control', 'no-cache');
-      res.json(req.body);
-    });
-  });
-});
-
 
 app.listen(app.get('port'), function() {
   console.log('Server started: http://localhost:' + app.get('port') + '/');

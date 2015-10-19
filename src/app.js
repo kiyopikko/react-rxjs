@@ -7,7 +7,7 @@ var Rx          = require('rx'),
     MainView    = require('./views/mainView.jsx');
 
 
-var counterStore = new CounterStore('counter');
+var counterStore = new CounterStore();
 
 //register our actions against our store updates stream
 CounterActions.register(counterStore.updates);

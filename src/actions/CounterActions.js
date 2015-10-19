@@ -7,8 +7,8 @@ var Rx      = require('rx'),
  * Thoses actions will trigger model update
  */
 var CounterActions = {
-  increment: new Rx.Subject(),
-  load: new Rx.Subject()
+  load: new Rx.Subject(),
+  receive: new Rx.Subject()
 };
 
 /**
@@ -17,15 +17,6 @@ var CounterActions = {
  * into the stream.
  */
 CounterActions.register = function (updates) {
-    this.increment
-        .map(function () {
-            // ここの引数はViewが渡して来たデータ
-            return function (counter) {
-                // ここの引数はStoreのデータ
-                return assign({}, counter, {counter: counter.counter + 1});
-            };
-        })
-        .subscribe(updates);
 
     this.load
         .map(function (loadedData) {
@@ -34,6 +25,15 @@ CounterActions.register = function (updates) {
             };
         })
         .subscribe(updates);
+
+    this.receive
+        .map(function (receivedData) {
+            return function (counter) {
+                return assign({}, counter, {counter: receivedData.counter});
+            };
+        })
+        .subscribe(updates);
+
 };
 
 

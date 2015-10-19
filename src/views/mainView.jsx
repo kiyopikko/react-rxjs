@@ -11,6 +11,8 @@ var React           = require('react/addons'),
     CounterActions  = require('../actions/CounterActions'),
     EventHandler    = require('../utils/eventHandler');
 
+var ENDPOINT_URL = '/api/';
+var KEY = 'counter';
 
 var MainView = React.createClass({
 
@@ -27,16 +29,35 @@ var MainView = React.createClass({
         incrementBtnClick
           .subscribe(CounterActions.increment);
 
+        var loadFromJson = EventHandler.create();
+        loadFromJson
+          .subscribe(CounterActions.load);
+
         this.handlers = {
-          incrementBtnClick: incrementBtnClick
+          incrementBtnClick: incrementBtnClick,
+          loadFromJson: loadFromJson
         };
     },
 
-
+    componentDidMount: function () {
+      // load from json
+      $.ajax({
+        url: ENDPOINT_URL + KEY,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+          data.counter = Number(data.counter);
+          this.handlers.loadFromJson(data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(ENDPOINT_URL + KEY, status, err.toString());
+        }
+      });
+    },
 
     render: function () {
 
-      var view = !this.state.counter ? 'Now loading...' :
+      var view = (!this.state.loaded) ? 'Now loading...' :
         <div>
           <h1>Hello</h1>
           <p>counter: {this.state.counter}</p>

@@ -7,7 +7,8 @@ var Rx      = require('rx'),
  * Thoses actions will trigger model update
  */
 var CounterActions = {
-  increment: new Rx.Subject()
+  increment: new Rx.Subject(),
+  load: new Rx.Subject()
 };
 
 /**
@@ -22,6 +23,14 @@ CounterActions.register = function (updates) {
             return function (counter) {
                 // ここの引数はStoreのデータ
                 return assign({}, counter, {counter: counter.counter + 1});
+            };
+        })
+        .subscribe(updates);
+
+    this.load
+        .map(function (loadedData) {
+            return function (counter) {
+                return assign({}, counter, {counter: loadedData.counter, loaded: true});
             };
         })
         .subscribe(updates);

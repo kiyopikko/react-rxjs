@@ -1,38 +1,21 @@
 /*jshint node:true, browser:true*/
-var Promise = require('es6-promise').Promise;
 
-var ENDPOINT = '/api/';
+var ENDPOINT_URL = '/api/';
 
-module.exports = {
+module.exports = function (key, data) {
 
-  load: function (namespace) {
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: ENDPOINT + namespace,
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-          resolve(data);
-        },
-        error: function(xhr, status, err) {
-          reject(ENDPOINT + namespace, status, err.toString());
-        }
-      });
-    });
-  },
+  if(!data) return;
 
-  save: function (namespace, data) {
-    $.ajax({
-      url: ENDPOINT + namespace,
-      dataType: 'json',
-      type: 'POST',
-      data: data,
-      success: function(successData) {
-        console.log(successData);
-      },
-      error: function(xhr, status, err) {
-        console.error(ENDPOINT + namespace, status, err.toString());
-      }
-    });
-  }
+  $.ajax({
+    url: ENDPOINT_URL + key,
+    dataType: 'json',
+    type: 'POST',
+    data: {counter: data.counter},
+    success: function(successData) {
+      console.log('save success: ', successData);
+    },
+    error: function(xhr, status, err) {
+      console.error(ENDPOINT_URL + key, status, err.toString());
+    }
+  });
 };

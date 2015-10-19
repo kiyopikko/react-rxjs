@@ -29852,7 +29852,8 @@ var Rx      = require('rx'),
  * Thoses actions will trigger model update
  */
 var CounterActions = {
-  increment: new Rx.Subject()
+  increment: new Rx.Subject(),
+  load: new Rx.Subject()
 };
 
 /**
@@ -29867,6 +29868,14 @@ CounterActions.register = function (updates) {
             return function (counter) {
                 // ここの引数はStoreのデータ
                 return assign({}, counter, {counter: counter.counter + 1});
+            };
+        })
+        .subscribe(updates);
+
+    this.load
+        .map(function (loadedData) {
+            return function (counter) {
+                return assign({}, counter, {counter: loadedData.counter, loaded: true});
             };
         })
         .subscribe(updates);
@@ -29907,25 +29916,19 @@ var Rx      = require('rx'),
 // `updates`: that should receive operations to be applied on our list of todo
 // `todos`: an observable that will contains our up to date list of todo
 function CounterStore(key) {
-    this.updates = new Rx.Subject();
+    this.updates = new Rx.BehaviorSubject({counter: 0});
 
-    this.data = {};
-
-    var loadedCounter = Rx.Observable.fromPromise(store.load(key));
-
-    var updateCounter = this.updates
-        .map(function (operation) {
-            return operation(this.data);
-        }.bind(this));
-
-    this.counter = loadedCounter
-                    .concat(updateCounter)
-                    .do(function(counter){
-                        this.data.counter = Number(counter.counter);
-                        store.save(key, this.data);
-                    }.bind(this));
+    this.counter = this.updates
+        .scan(function (counter, operation) {
+            return operation(counter);
+        });
 
     this.key = key;
+
+    this.counter.forEach(function (counter) {
+        if(!counter.loaded) return;
+        store(key, counter);
+    });
 }
 
 
@@ -29980,38 +29983,22 @@ var Promise = require('es6-promise').Promise;
 
 var ENDPOINT = '/api/';
 
-module.exports = {
+module.exports = function (namespace, data) {
 
-  load: function (namespace) {
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: ENDPOINT + namespace,
-        dataType: 'json',
-        cache: false,
-        success: function(data) {
-          resolve(data);
-        },
-        error: function(xhr, status, err) {
-          reject(ENDPOINT + namespace, status, err.toString());
-        }
-      });
-    });
-  },
+  if(!data) return;
 
-  save: function (namespace, data) {
-    $.ajax({
-      url: ENDPOINT + namespace,
-      dataType: 'json',
-      type: 'POST',
-      data: data,
-      success: function(successData) {
-        console.log(successData);
-      },
-      error: function(xhr, status, err) {
-        console.error(ENDPOINT + namespace, status, err.toString());
-      }
-    });
-  }
+  $.ajax({
+    url: ENDPOINT + namespace,
+    dataType: 'json',
+    type: 'POST',
+    data: {counter: data.counter},
+    success: function(successData) {
+      console.log('save success: ', successData);
+    },
+    error: function(xhr, status, err) {
+      console.error(ENDPOINT + namespace, status, err.toString());
+    }
+  });
 };
 },{"es6-promise":1}],160:[function(require,module,exports){
 /**
@@ -30027,6 +30014,8 @@ var React           = require('react/addons'),
     CounterActions  = require('../actions/CounterActions'),
     EventHandler    = require('../utils/eventHandler');
 
+var ENDPOINT = '/api/';
+var KEY = 'counter';
 
 var MainView = React.createClass({displayName: 'MainView',
 
@@ -30043,16 +30032,35 @@ var MainView = React.createClass({displayName: 'MainView',
         incrementBtnClick
           .subscribe(CounterActions.increment);
 
+        var loadFromJson = EventHandler.create();
+        loadFromJson
+          .subscribe(CounterActions.load);
+
         this.handlers = {
-          incrementBtnClick: incrementBtnClick
+          incrementBtnClick: incrementBtnClick,
+          loadFromJson: loadFromJson
         };
     },
 
-
+    componentDidMount: function () {
+      // load from json
+      $.ajax({
+        url: ENDPOINT + KEY,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+          data.counter = Number(data.counter);
+          this.handlers.loadFromJson(data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(ENDPOINT + KEY, status, err.toString());
+        }
+      });
+    },
 
     render: function () {
 
-      var view = !this.state.counter ? 'Now loading...' :
+      var view = (!this.state.loaded) ? 'Now loading...' :
         React.DOM.div(null, 
           React.DOM.h1(null, "Hello"), 
           React.DOM.p(null, "counter: ", this.state.counter), 

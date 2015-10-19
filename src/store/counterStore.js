@@ -8,25 +8,19 @@ var Rx      = require('rx'),
 // `updates`: that should receive operations to be applied on our list of todo
 // `todos`: an observable that will contains our up to date list of todo
 function CounterStore(key) {
-    this.updates = new Rx.Subject();
+    this.updates = new Rx.BehaviorSubject({counter: 0});
 
-    this.data = {};
-
-    var loadedCounter = Rx.Observable.fromPromise(store.load(key));
-
-    var updateCounter = this.updates
-        .map(function (operation) {
-            return operation(this.data);
-        }.bind(this));
-
-    this.counter = loadedCounter
-                    .concat(updateCounter)
-                    .do(function(counter){
-                        this.data.counter = Number(counter.counter);
-                        store.save(key, this.data);
-                    }.bind(this));
+    this.counter = this.updates
+        .scan(function (counter, operation) {
+            return operation(counter);
+        });
 
     this.key = key;
+
+    this.counter.forEach(function (counter) {
+        if(!counter.loaded) return;
+        store(key, counter);
+    });
 }
 
 

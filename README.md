@@ -3,6 +3,8 @@
 from [justinwoo/react-rxjs-flow
 ](https://github.com/justinwoo/react-rxjs-flow)
 
+save counter data using ajax
+
 ## Install Package
 
 ```

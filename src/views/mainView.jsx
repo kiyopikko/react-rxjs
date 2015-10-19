@@ -32,12 +32,20 @@ var MainView = React.createClass({
         };
     },
 
+
+
     render: function () {
-      return (
+
+      var view = !this.state.counter ? 'Now loading...' :
         <div>
           <h1>Hello</h1>
           <p>counter: {this.state.counter}</p>
           <button onClick={this.handlers.incrementBtnClick}>increment</button>
+        </div>;
+
+      return (
+        <div>
+          {view}
         </div>
       );
     }

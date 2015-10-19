@@ -22,19 +22,17 @@ module.exports = {
   },
 
   save: function (namespace, data) {
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: ENDPOINT + namespace,
-        dataType: 'json',
-        type: 'POST',
-        data: data,
-        success: function(successData) {
-          resolve(successData);
-        },
-        error: function(xhr, status, err) {
-          reject(ENDPOINT + namespace, status, err.toString());
-        }
-      });
+    $.ajax({
+      url: ENDPOINT + namespace,
+      dataType: 'json',
+      type: 'POST',
+      data: data,
+      success: function(successData) {
+        console.log(successData);
+      },
+      error: function(xhr, status, err) {
+        console.error(ENDPOINT + namespace, status, err.toString());
+      }
     });
   }
 };

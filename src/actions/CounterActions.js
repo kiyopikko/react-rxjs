@@ -1,7 +1,7 @@
 /*jshint node : true */
 
-var Rx      = require('rx');
-
+var Rx      = require('rx'),
+    assign  = require('../utils/assign');
 /**
  * A set of actions that will be exposed into views
  * Thoses actions will trigger model update
@@ -21,7 +21,7 @@ CounterActions.register = function (updates) {
             // ここの引数はViewが渡して来たデータ
             return function (counter) {
                 // ここの引数はStoreのデータ
-                return {counter: counter.counter + 1};
+                return assign({}, counter, {counter: counter.counter + 1});
             };
         })
         .subscribe(updates);

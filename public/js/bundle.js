@@ -29845,8 +29845,8 @@ module.exports = Rx;
 },{"./dist/rx.all":151,"./dist/rx.testing":152,"events":161}],154:[function(require,module,exports){
 /*jshint node : true */
 
-var Rx      = require('rx');
-
+var Rx      = require('rx'),
+    assign  = require('../utils/assign');
 /**
  * A set of actions that will be exposed into views
  * Thoses actions will trigger model update
@@ -29866,7 +29866,7 @@ CounterActions.register = function (updates) {
             // ここの引数はViewが渡して来たデータ
             return function (counter) {
                 // ここの引数はStoreのデータ
-                return {counter: counter.counter + 1};
+                return assign({}, counter, {counter: counter.counter + 1});
             };
         })
         .subscribe(updates);
@@ -29874,7 +29874,7 @@ CounterActions.register = function (updates) {
 
 
 module.exports = CounterActions;
-},{"rx":153}],155:[function(require,module,exports){
+},{"../utils/assign":157,"rx":153}],155:[function(require,module,exports){
 /*jshint node:true, browser: true*/
 
 var Rx          = require('rx'),
@@ -29909,19 +29909,21 @@ var Rx      = require('rx'),
 function CounterStore(key) {
     this.updates = new Rx.Subject();
 
+    this.data = {};
+
     var loadedCounter = Rx.Observable.fromPromise(store.load(key));
 
     var updateCounter = this.updates
-        .scan(function (counter, operation) {
-            return operation(counter);
-        });
+        .map(function (operation) {
+            return operation(this.data);
+        }.bind(this));
 
     this.counter = loadedCounter
                     .concat(updateCounter)
-                    .map(function(counter){
-                        console.log(counter);
-                        return counter;
-                    })
+                    .do(function(counter){
+                        this.data.counter = Number(counter.counter);
+                        store.save(key, this.data);
+                    }.bind(this));
 
     this.key = key;
 }
@@ -29997,19 +29999,17 @@ module.exports = {
   },
 
   save: function (namespace, data) {
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: ENDPOINT + namespace,
-        dataType: 'json',
-        type: 'POST',
-        data: data,
-        success: function(successData) {
-          resolve(successData);
-        },
-        error: function(xhr, status, err) {
-          reject(ENDPOINT + namespace, status, err.toString());
-        }
-      });
+    $.ajax({
+      url: ENDPOINT + namespace,
+      dataType: 'json',
+      type: 'POST',
+      data: data,
+      success: function(successData) {
+        console.log(successData);
+      },
+      error: function(xhr, status, err) {
+        console.error(ENDPOINT + namespace, status, err.toString());
+      }
     });
   }
 };
@@ -30048,12 +30048,20 @@ var MainView = React.createClass({displayName: 'MainView',
         };
     },
 
+
+
     render: function () {
-      return (
+
+      var view = !this.state.counter ? 'Now loading...' :
         React.DOM.div(null, 
           React.DOM.h1(null, "Hello"), 
           React.DOM.p(null, "counter: ", this.state.counter), 
           React.DOM.button({onClick: this.handlers.incrementBtnClick}, "increment")
+        );
+
+      return (
+        React.DOM.div(null, 
+          view
         )
       );
     }

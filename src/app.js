@@ -7,7 +7,7 @@ var Rx          = require('rx'),
     MainView    = require('./views/mainView.jsx');
 
 
-var counterStore = new CounterStore('react-rxjs-todomvc-style');
+var counterStore = new CounterStore('counter');
 
 //register our actions against our store updates stream
 CounterActions.register(counterStore.updates);

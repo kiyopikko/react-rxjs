@@ -2,19 +2,50 @@ var React = require('react');
 
 var Intent = require('../intent');
 
+var ENDPOINT = '/api/counter';
+
 class Root extends React.Component {
 
   constructor() {
     super();
 
-    this.handleIncrement = function () {
-      Intent.incrementCounter();
+    this.handleIncrement = () => {
+      this.saveCounterToServer(1, Intent.incrementCounter);
     }
-    this.handleLoad = function () {
-      Intent.loadCounter();
+    this.handleLoad = (data) => {
+      Intent.loadCounter(data);
     }
 
-    this.handleLoad();
+    this.loadCounterFromServer(this.handleLoad);
+  }
+
+  loadCounterFromServer(callback) {
+    $.ajax({
+      url: ENDPOINT,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        callback(data);
+      },
+      error: function(xhr, status, err) {
+        console.error(ENDPOINT, status, err.toString());
+      }
+    });
+  }
+
+  saveCounterToServer(data, callback) {
+    $.ajax({
+      url: ENDPOINT,
+      dataType: 'json',
+      type: 'POST',
+      data: {counter: this.props.counter + data},
+      success: function(successData) {
+        callback(successData);
+      },
+      error: function(xhr, status, err) {
+        console.error(ENDPOINT, status, err.toString());
+      }
+    });
   }
 
   render() {

@@ -8,11 +8,11 @@ var subjects = {
 module.exports = {
   subjects: subjects,
 
-  incrementCounter: function () {
-    subjects.incrementCounterSubject.onNext();
+  incrementCounter: function (data) {
+    subjects.incrementCounterSubject.onNext(data);
   },
 
-  loadCounter: function () {
-    subjects.loadCounterSubject.onNext();
+  loadCounter: function (data) {
+    subjects.loadCounterSubject.onNext(data);
   }
 };

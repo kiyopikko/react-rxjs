@@ -2,6 +2,8 @@
 
 from [fdecampredon/react-rxjs-todomvc](https://github.com/fdecampredon/react-rxjs-todomvc)
 
+save counter data using ajax
+
 ## Install Package
 
 ```

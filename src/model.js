@@ -7,6 +7,8 @@ var subject = new Rx.ReplaySubject(1);
 
 var ds = require('./datastore');
 
+const KEY = 'INCREMENT_COUNTER';
+
 var state = {
   counter: 0,
   counterLoaded: false
@@ -25,7 +27,7 @@ Intent.subjects.loadCounterSubject.subscribe(function (data) {
 
 
 Intent.subjects.incrementCounterSubject.subscribe(function () {
-  ds.set('INCREMENT_COUNTER', {counter: state.counter + 1},
+  ds.set(KEY, {counter: state.counter + 1},
   function(err, datum){
     if(err){
       console.error(err);

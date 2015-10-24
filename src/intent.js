@@ -13,8 +13,8 @@ var subjects = {
 module.exports = {
   subjects: subjects,
 
-  incrementCounter: function () {
-    subjects.incrementCounterSubject.onNext();
+  incrementCounter: function (data) {
+    saveCounter({counter: data.counter + 1});
   },
 
   loadCounter: function () {
@@ -57,5 +57,19 @@ function onCounterLoaded(callback){
       return;
     }
     callback(datum.value);
+  });
+}
+
+// save data to milkcocoa
+function saveCounter(data){
+  ds.set(KEY, data,
+  function(err, datum){
+    if(err){
+      console.error(err);
+      return;
+    }
+    console.log('setted complete: ', datum.value);
+  }, function(err){
+    console.error(err);
   });
 }

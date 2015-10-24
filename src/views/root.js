@@ -8,13 +8,17 @@ class Root extends React.Component {
     super();
 
     this.handlers = {
-      increment: () => Intent.incrementCounter(),
+      increment: () => Intent.incrementCounter({counter: this.getCounter()}),
       load: () => Intent.loadCounter(),
       watch: () => Intent.watchCounter()
     }
 
     this.handlers.load();
     this.handlers.watch();
+  }
+
+  getCounter() {
+    return this.props.counter;
   }
 
   render() {

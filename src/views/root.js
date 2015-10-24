@@ -10,13 +10,19 @@ class Root extends React.Component {
     super();
 
     this.handleIncrement = () => {
-      this.saveCounterToServer(1, Intent.incrementCounter);
+      this.saveCounterToServer({
+        counter: this.getCounter() + 1
+      }, Intent.incrementCounter);
     }
     this.handleLoad = (data) => {
       Intent.loadCounter(data);
     }
 
     this.loadCounterFromServer(this.handleLoad);
+  }
+
+  getCounter() {
+    return this.props.counter;
   }
 
   loadCounterFromServer(callback) {
@@ -38,7 +44,7 @@ class Root extends React.Component {
       url: ENDPOINT,
       dataType: 'json',
       type: 'POST',
-      data: {counter: this.props.counter + data},
+      data: data,
       success: function(successData) {
         callback(successData);
       },
